@@ -3,7 +3,10 @@ APP_BG = "black"
 
 BUTTON_STICKY = 'N'
 BUTTON_FONT = ('Arial', 10, 'italic')
-BUTTON_BG = 'grey'
-BUTTON_FG = 'white'
+BUTTON_BG = '#505050'
+BUTTON_FG = '#00ff00'
 
-BRIGHT_GREEN = '#66ff0f'
+CANVAS_HEIGHT = 600
+CANVAS_WIDTH = 1000
+
+BRIGHT_GREEN = '#00ff0f'
