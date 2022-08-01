@@ -118,7 +118,8 @@ class AppFrame:
     
     def __upload_image(self):
         self._canvas.delete('all')
-        self._filename = filedialog.askopenfilename()
+        self._filename = filedialog.askopenfilename(filetypes=Macros.FILETYPES)
+        self._destinationFile = None
         self._original_img = Image.open(self._filename)
         self._editing_img = Image.open(self._filename)
         self._edited_img = Image.open(self._filename)
