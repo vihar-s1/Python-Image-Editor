@@ -10,6 +10,9 @@ import Macros
 
 class AppFrame:
     def __init__(self) -> None:
+        self._original_img = self._editing_img = self._edited_img = None
+        self._filename = self._destinationFile = None
+        
         self._window = tkinter.Tk(className="Python Image Editor")
         self._window.config(bg=Macros.APP_BG)
         self._header = tkinter.Frame(
@@ -78,9 +81,9 @@ class AppFrame:
                        fg=Macros.BUTTON_FG, command=self.__filters).grid( row=4, column=0, columnspan=2, 
                                                                           padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
-        tkinter.Button(self._app_frame, text="Blur / Sharpen", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
-                        fg=Macros.BUTTON_FG, command=self.__blur_sharp_image).grid(row=5, column=0, columnspan=2, 
-                                                                            padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        self.Buttons['Blur / Sharpen'] = tkinter.Button(self._app_frame, text="Blur / Sharpen", font=Macros.BUTTON_FONT,
+                                                        bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
+        self.Buttons['Blur / Sharpen'].grid(row=5, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         
         self.__rotate_frame = tkinter.Frame(self._app_frame, bg=Macros.APP_BG)
@@ -216,21 +219,6 @@ class AppFrame:
             self._side_frame, text="Dilation", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG
         )
         self.Buttons['Dilation'].grid(row=8, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-
-    def __blur_sharp_image(self):
-        self._refresh_side_frame()
-        tkinter.Label(self._side_frame, text='Blur Level', font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
-                      ).grid(row=1, column=0, padx=Macros.PADX, sticky=Macros.BUTTON_STICKY)
-        
-        self.Buttons['Blur Slider'] = tkinter.Scale(self._side_frame, from_=1, to=256, orient='horizontal', bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
-        self.Buttons['Blur Slider'].grid(row=0, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-        
-        tkinter.Label(self._side_frame, text='Sharpness Level', font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
-                      ).grid(row=3, column=0, padx=Macros.PADX, sticky=Macros.BUTTON_STICKY)
-        
-        self.Buttons['Sharp Slider'] = tkinter.Scale(self._side_frame, from_=1, to=256, orient='horizontal', bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
-        self.Buttons['Sharp Slider'].grid(row=2, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
     
     def run(self):
