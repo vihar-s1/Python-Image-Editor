@@ -11,6 +11,7 @@ import Macros
 class AppFrame:
     def __init__(self) -> None:
         self._window = tkinter.Tk(className="Python Image Editor")
+        self._window.config(bg=Macros.APP_BG)
         self._header = tkinter.Frame(
             self._window, bg=Macros.APP_BG, padx=Macros.PADX, pady=Macros.PADY)
         self._header.pack()
@@ -19,29 +20,37 @@ class AppFrame:
         self.__defineIcons()
         
         tkinter.Label(self._header, text="Python Image Editor", font=('Agency FB', 26, 'bold', 'italic'),
-                      bg=Macros.APP_BG, fg=Macros.BRIGHT_GREEN).grid(row=0, column=2)
+                      bg=Macros.APP_BG, fg=Macros.BRIGHT_GREEN).grid(row=0, column=0)
 
-        tkinter.Label(self._header, text="",
+        tkinter.Label(self._header, text="  ",
                       bg=Macros.APP_BG).grid(row=1, column=2)
 
-        self.Buttons['Save'] = tkinter.Button(self._header, text="Save",
+        self._header_buttons = tkinter.Frame(self._header, bg=Macros.APP_BG, padx=Macros.PADX, pady=Macros.PADY)
+        self._header_buttons.grid(row=2, column=0)
+        
+        self.Buttons['Save'] = tkinter.Button(self._header_buttons, text="Save",
                                               font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
-        self.Buttons['Save'].grid(row=2, column=0)
+        self.Buttons['Save'].grid(row=0, column=0, padx=Macros.PADX)
 
-        self.Buttons['Save As'] = tkinter.Button(self._header, text="Save As",
+        self.Buttons['Save As'] = tkinter.Button(self._header_buttons, text="Save As",
                                                  font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
-        self.Buttons['Save As'].grid(row=2, column=1)
+        self.Buttons['Save As'].grid(row=0, column=1, padx=Macros.PADX)
 
-        self.Buttons['Reset Image'] = tkinter.Button(self._header, text="Reset Image",
+        self.Buttons['Reset Image'] = tkinter.Button(self._header_buttons, text="Reset Image",
                                                      font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
-        self.Buttons['Reset Image'].grid(row=2, column=2)
+        self.Buttons['Reset Image'].grid(row=0, column=2, padx=Macros.PADX)
 
-        self.Buttons['Apply Changes'] = tkinter.Button(self._header, text="Apply Changes",
+        self.Buttons['Apply Changes'] = tkinter.Button(self._header_buttons, text="Apply Changes",
                                                        font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
-        self.Buttons['Apply Changes'].grid(row=2, column=3)
+        self.Buttons['Apply Changes'].grid(row=0, column=3, padx=Macros.PADX)
+        
+        self.Buttons['Cancel Changes'] = tkinter.Button(self._header_buttons, text="Cancel Changes",
+                                                        font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
+        self.Buttons['Cancel Changes'].grid(row=0, column=4, padx=Macros.PADX)
 
-        tkinter.Button(self._header, text="Exit", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
-                       fg=Macros.BUTTON_FG, command=self._window.quit).grid(row=2, column=4)
+        tkinter.Button(self._header_buttons, text="Exit Editor", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
+                       fg=Macros.BUTTON_FG, command=self._window.quit).grid(row=0, column=5, padx=Macros.PADX)
+
 
         self._app_frame = tkinter.Frame(self._window, bg=Macros.APP_BG)
         self._app_frame.pack()
@@ -69,10 +78,9 @@ class AppFrame:
                        fg=Macros.BUTTON_FG, command=self.__filters).grid( row=4, column=0, columnspan=2, 
                                                                           padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
-        self.Buttons['Blur Image'] = tkinter.Button(self._app_frame, text="Blur Image", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
-                                                    fg=Macros.BUTTON_FG)
-        self.Buttons['Blur Image'].grid(
-            row=5, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        tkinter.Button(self._app_frame, text="Blur / Sharpen", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
+                        fg=Macros.BUTTON_FG, command=self.__blur_sharp_image).grid(row=5, column=0, columnspan=2, 
+                                                                            padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         
         self.__rotate_frame = tkinter.Frame(self._app_frame, bg=Macros.APP_BG)
@@ -117,12 +125,12 @@ class AppFrame:
     
     
     def __upload_image(self):
-        self._canvas.delete('all')
         self._filename = filedialog.askopenfilename(filetypes=Macros.FILETYPES)
         self._destinationFile = None
         self._original_img = Image.open(self._filename)
         self._editing_img = Image.open(self._filename)
         self._edited_img = Image.open(self._filename)
+        self._canvas.delete('all')
         self._displayImage(self._edited_img)
 
     def _refresh_side_frame(self):
@@ -130,9 +138,12 @@ class AppFrame:
         self._canvas.unbind("<ButtonPress>")
         self._canvas.unbind("<B1-Motion>")
         self._canvas.unbind("<ButtonRelease>")
-        self._displayImage(self._edited_img)
+        try:
+            self._displayImage(self._edited_img)
+        except:
+            pass
         self._side_frame = tkinter.Frame(self._app_frame, bg=Macros.APP_BG)
-        self._side_frame.grid(row=0, column=4, rowspan=10, padx=50, pady=15)
+        self._side_frame.grid(row=0, column=4, rowspan=10, padx=Macros.PADX, pady=Macros.PADY)
 
     def _displayImage(self, image: Image.Image | None):
         if not image:
@@ -206,6 +217,22 @@ class AppFrame:
         )
         self.Buttons['Dilation'].grid(row=8, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
+
+    def __blur_sharp_image(self):
+        self._refresh_side_frame()
+        tkinter.Label(self._side_frame, text='Blur Level', font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
+                      ).grid(row=1, column=0, padx=Macros.PADX, sticky=Macros.BUTTON_STICKY)
+        
+        self.Buttons['Blur Slider'] = tkinter.Scale(self._side_frame, from_=1, to=256, orient='horizontal', bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
+        self.Buttons['Blur Slider'].grid(row=0, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        
+        tkinter.Label(self._side_frame, text='Sharpness Level', font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
+                      ).grid(row=3, column=0, padx=Macros.PADX, sticky=Macros.BUTTON_STICKY)
+        
+        self.Buttons['Sharp Slider'] = tkinter.Scale(self._side_frame, from_=1, to=256, orient='horizontal', bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
+        self.Buttons['Sharp Slider'].grid(row=2, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+
+    
     def run(self):
         self._window.mainloop()
 
