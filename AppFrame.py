@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import tkinter
+import tkinter, os
 from tkinter import filedialog
 from PIL import Image
 from PIL.ImageTk import PhotoImage
@@ -77,9 +77,9 @@ class AppFrame:
         self.Buttons['Draw'].grid(row=3, column=0, columnspan=2,
                                   padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
-        tkinter.Button(self._app_frame, text="Apply Filters", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, 
-                       fg=Macros.BUTTON_FG, command=self.__filters).grid( row=4, column=0, columnspan=2, 
-                                                                          padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        self.Buttons['Apply Filters'] = tkinter.Button(self._app_frame, text="Apply Filters", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, 
+                       fg=Macros.BUTTON_FG)
+        self.Buttons['Apply Filters'].grid( row=4, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         self.Buttons['Blur / Sharpen'] = tkinter.Button(self._app_frame, text="Blur / Sharpen", font=Macros.BUTTON_FONT,
                                                         bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
@@ -130,11 +130,12 @@ class AppFrame:
     def __upload_image(self):
         self._filename = filedialog.askopenfilename(filetypes=Macros.FILETYPES)
         self._destinationFile = None
-        self._original_img = Image.open(self._filename)
-        self._editing_img = Image.open(self._filename)
-        self._edited_img = Image.open(self._filename)
-        self._canvas.delete('all')
-        self._displayImage(self._edited_img)
+        if os.path.isfile(self._filename):
+            self._original_img = Image.open(self._filename)
+            self._editing_img = Image.open(self._filename)
+            self._edited_img = Image.open(self._filename)
+            self._canvas.delete('all')
+            self._displayImage(self._edited_img)
 
     def _refresh_side_frame(self):
         self._side_frame.grid_forget()
@@ -148,6 +149,7 @@ class AppFrame:
         self._side_frame = tkinter.Frame(self._app_frame, bg=Macros.APP_BG)
         self._side_frame.grid(row=0, column=4, rowspan=10, padx=Macros.PADX, pady=Macros.PADY)
 
+  
     def _displayImage(self, image: Image.Image | None):
         if not image:
             image = self._edited_img
@@ -163,63 +165,15 @@ class AppFrame:
                 newHeight = int(newWidth * ratio)
             else:
                 newHeight = Macros.CANVAS_HEIGHT
-                newWidth = int(newHeight * width / height)
+                newWidth = int(newHeight / ratio)
 
         image = image.resize((newWidth, newHeight))
         self.display_img = PhotoImage(image=image)
         self._canvas.delete('all')
         
         self._canvas.config(width=newWidth, height=newHeight)
-        self._canvas.create_image(
-            newWidth/2, newHeight/2, image=self.display_img)
-
-    def __filters(self):
-        self._refresh_side_frame()
-        self.Buttons['Negative'] = tkinter.Button(
-            self._side_frame, text="Negative", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG
-        )
-        self.Buttons["Negative"].grid(row=0, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        self.Buttons['Black-White'] = tkinter.Button(
-            self._side_frame, text="Black And white", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG
-        )
-        self.Buttons['Black-White'].grid(row=1, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        self.Buttons['Stylisation'] = tkinter.Button(
-            self._side_frame, text="Stylisation", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG
-        )
-        self.Buttons['Stylisation'].grid(row=2, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        self.Buttons['Sketch Effect'] = tkinter.Button(
-            self._side_frame, text="Sketch Effect", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG
-        )
-        self.Buttons['Sketch Effect'].grid(row=3, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        self.Buttons['Emboss'] = tkinter.Button(
-            self._side_frame, text="Emboss", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG
-        )
-        self.Buttons['Emboss'].grid(row=4, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        self.Buttons['Sepia'] = tkinter.Button(
-            self._side_frame, text="Sepia", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG
-        )
-        self.Buttons['Sepia'].grid(row=5, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        self.Buttons['Binary Thresholding'] = tkinter.Button(
-            self._side_frame, text="Binary Thresholding", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG
-        )
-        self.Buttons['Binary Thresholding'].grid(row=6, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        self.Buttons['Erosion'] = tkinter.Button(
-            self._side_frame, text="Erosion", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG
-        )
-        self.Buttons['Erosion'].grid(row=7, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        self.Buttons['Dilation'] = tkinter.Button(
-            self._side_frame, text="Dilation", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG
-        )
-        self.Buttons['Dilation'].grid(row=8, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
+        self._canvas.create_image(newWidth/2, newHeight/2, image=self.display_img)
+        
     
     def run(self):
         self._window.mainloop()
