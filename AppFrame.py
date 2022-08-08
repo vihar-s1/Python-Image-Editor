@@ -67,27 +67,22 @@ class AppFrame:
         self.Buttons['Crop Image'].grid(
             row=1, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
-        self.Buttons['Add Text'] = tkinter.Button(self._app_frame, text="Add Text", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
-                                                  fg=Macros.BUTTON_FG)
-        self.Buttons['Add Text'].grid(
-            row=2, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        self.Buttons['Draw'] = tkinter.Button(self._app_frame, text="Draw", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
+        self.Buttons['Split Channel'] = tkinter.Button(self._app_frame, text="Split Channel", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
                                               fg=Macros.BUTTON_FG)
-        self.Buttons['Draw'].grid(row=3, column=0, columnspan=2,
+        self.Buttons['Split Channel'].grid(row=2, column=0, columnspan=2,
                                   padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         self.Buttons['Apply Filters'] = tkinter.Button(self._app_frame, text="Apply Filters", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, 
                        fg=Macros.BUTTON_FG)
-        self.Buttons['Apply Filters'].grid( row=4, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        self.Buttons['Apply Filters'].grid( row=3, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         self.Buttons['Level Adjust'] = tkinter.Button(self._app_frame, text="Level Adjust", font=Macros.BUTTON_FONT,
                                                         bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
-        self.Buttons['Level Adjust'].grid(row=5, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        self.Buttons['Level Adjust'].grid(row=4, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         
         self.__rotate_frame = tkinter.Frame(self._app_frame, bg=Macros.APP_BG)
-        self.__rotate_frame.grid(row=6, column=0, columnspan=2)
+        self.__rotate_frame.grid(row=5, column=0, columnspan=2)
         
         self.Buttons['Rotate Left'] = tkinter.Button(self.__rotate_frame, image=self.__rotateLeftIcon, bg=Macros.BUTTON_BG,
                                                       fg=Macros.BUTTON_FG)
@@ -142,10 +137,7 @@ class AppFrame:
         self._canvas.unbind("<ButtonPress>")
         self._canvas.unbind("<B1-Motion>")
         self._canvas.unbind("<ButtonRelease>")
-        try:
-            self._displayImage(self._edited_img)
-        except:
-            pass
+        self._displayImage(self._edited_img)
         self._side_frame = tkinter.Frame(self._app_frame, bg=Macros.APP_BG)
         self._side_frame.grid(row=0, column=4, rowspan=10, padx=Macros.PADX, pady=Macros.PADY)
 

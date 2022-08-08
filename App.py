@@ -21,6 +21,7 @@ class App(AppFrame):
         self.Buttons['Cancel Changes'].config(command=self.__cancelChanges)
         
         self.Buttons['Crop Image'].config(command=self.__cropImage)
+        self.Buttons['Split Channel'].config(command=self.__splitChannel)
         self.Buttons['Apply Filters'].config(command=self.__filters)
         self.Buttons['Level Adjust'].config(command=self.__levelAdjust)
         self.Buttons['Rotate Left'].config(command=self.__rotateLeft)
@@ -90,6 +91,40 @@ class App(AppFrame):
     def __cropImage(self):
         pass
     
+    def __splitChannel(self):
+        self._refresh_side_frame()
+        
+        tkinter.Button(self._side_frame, text='Red Channel', font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__redChannel
+                       ).grid(row=0, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        
+        tkinter.Button(self._side_frame, text='Green Channel', font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__greenChannel
+                       ).grid(row=1, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        
+        tkinter.Button(self._side_frame, text='Blue Channel', font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__blueChannel
+                       ).grid(row=2, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        
+    def __redChannel(self):
+        if self._edited_img:
+            red = self._edited_img.convert("RGB").getdata(0)
+            red = [ (r, 0, 0) for r in red ]
+            self._editing_img.putdata(red)
+            self._displayImage(self._editing_img)
+        
+    def __greenChannel(self):
+        if self._edited_img:
+            green = self._edited_img.convert("RGB").getdata(1)
+            green = [ (0, g, 0) for g in green ]
+            self._editing_img.putdata(green)
+            self._displayImage(self._editing_img)
+        
+    def __blueChannel(self):
+        if self._edited_img:
+            blue = self._edited_img.convert("RGB").getdata(2)
+            blue = [ (0, 0, b) for b in blue ]
+            self._editing_img.putdata(blue)
+            self._displayImage(self._editing_img)
+    
+    
     def __filters(self):
         self._refresh_side_frame()
         
@@ -141,13 +176,13 @@ class App(AppFrame):
             img_invert = img_gray.point(lambda x: 255-x)
             img_smooth = img_invert.filter(ImageFilter.GaussianBlur(200))
             invert_smooth = img_smooth.point(lambda x: 255-x)
-            final = asarray(img_gray) / asarray(invert_smooth) * 256
+            try: # To suppress RuntimeWarning of divide by zero, and invalid value encountered
+                final = asarray(img_gray) / asarray(invert_smooth) * 256
+            except Exception:
+                pass
             self._editing_img = Image.fromarray(final)
             self._displayImage(self._editing_img)
-            
-            
-    def __sepia(self):
-        pass
+        
     
     def __thresholding(self, value):
         if self._edited_img:
@@ -184,18 +219,20 @@ class App(AppFrame):
         tkinter.Scale(self._side_frame, from_=0.0, resolution=0.1, to=3.0, label='Saturation', orient='horizontal',
                       font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG, command=self.__saturateImage
                       ).grid(row=3, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        
+        tkinter.Scale(self._side_frame, from_=0.0, resolution=0.1, to=3.0, label='Contrast', orient='horizontal',
+                      font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG, command=self.__contrastImage
+                      ).grid(row=4, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
     
     def __blurImage(self, value):
         if self._edited_img:
-            value = int(value)
-            self._editing_img = self._edited_img.filter(ImageFilter.GaussianBlur(value))
+            self._editing_img = self._edited_img.filter(ImageFilter.GaussianBlur(int(value)))
             self._displayImage(self._editing_img)
             
     def __sharpenImage(self, value):
         if self._edited_img:
-            value = int(value)
-            self._editing_img = ImageEnhance.Sharpness(self._edited_img).enhance(value)
+            self._editing_img = ImageEnhance.Sharpness(self._edited_img).enhance(int(value))
             self._displayImage(self._editing_img)
     
     def __brightenImage(self, value):
@@ -206,6 +243,11 @@ class App(AppFrame):
     def __saturateImage(self, value):
         if self._edited_img:
             self._editing_img = ImageEnhance.Color(self._edited_img).enhance(float(value))
+            self._displayImage(self._editing_img)
+            
+    def __contrastImage(self, value):
+        if self._edited_img:
+            self._editing_img = ImageEnhance.Contrast(self._edited_img).enhance(float(value))
             self._displayImage(self._editing_img)
         
 if __name__ == "__main__":
