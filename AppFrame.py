@@ -81,9 +81,9 @@ class AppFrame:
                        fg=Macros.BUTTON_FG)
         self.Buttons['Apply Filters'].grid( row=4, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
-        self.Buttons['Blur / Sharpen'] = tkinter.Button(self._app_frame, text="Blur / Sharpen", font=Macros.BUTTON_FONT,
+        self.Buttons['Level Adjust'] = tkinter.Button(self._app_frame, text="Level Adjust", font=Macros.BUTTON_FONT,
                                                         bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG)
-        self.Buttons['Blur / Sharpen'].grid(row=5, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        self.Buttons['Level Adjust'].grid(row=5, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         
         self.__rotate_frame = tkinter.Frame(self._app_frame, bg=Macros.APP_BG)

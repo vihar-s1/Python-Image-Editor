@@ -3,6 +3,9 @@
 from PIL import Image, ImageFilter, ImageEnhance, ImageOps, ImageMath
 import tkinter
 from tkinter import filedialog
+
+from numpy import asarray, invert
+import numpy
 import Macros
 from AppFrame import AppFrame
 
@@ -19,7 +22,7 @@ class App(AppFrame):
         
         self.Buttons['Crop Image'].config(command=self.__cropImage)
         self.Buttons['Apply Filters'].config(command=self.__filters)
-        self.Buttons['Blur / Sharpen'].config(command=self.__blur_sharp_image)
+        self.Buttons['Level Adjust'].config(command=self.__levelAdjust)
         self.Buttons['Rotate Left'].config(command=self.__rotateLeft)
         self.Buttons['Rotate Right'].config(command=self.__rotateRight)
         self.Buttons['Flip Horizontal'].config(command=self.__flipHorizontal)
@@ -70,14 +73,12 @@ class App(AppFrame):
     
     def __resetImage(self):
         if self._original_img:
-            self._refresh_side_frame()
             self._editing_img = self._original_img.copy()
             self._edited_img = self._original_img.copy()
             self._displayImage(self._edited_img)
     
     def __applyChanges(self):
         if self._editing_img:
-            self._refresh_side_frame()
             self._edited_img = self._editing_img.copy()
             self._displayImage(self._edited_img)
     
@@ -108,30 +109,22 @@ class App(AppFrame):
             self._side_frame, text="Pencil Sketch", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__sketch
         ).grid(row=3, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
-        tkinter.Button(
-            self._side_frame, text="Emboss", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__emboss
+        tkinter.Scale(
+            self._side_frame, label="Thresholding", from_=0, to=256, font=Macros.BUTTON_FONT, orient='horizontal',
+            fg=Macros.BUTTON_FG,bg=Macros.BUTTON_BG, command=self.__thresholding
         ).grid(row=4, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         tkinter.Button(
-            self._side_frame, text="Sepia", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__sepia
-        ).grid(row=5, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        tkinter.Scale(
-            self._side_frame, label="Thresholding", from_=0, to=255, font=Macros.BUTTON_FONT, orient='horizontal',
-            fg=Macros.BUTTON_FG,bg=Macros.BUTTON_BG, command=self.__thresholding
-        ).grid(row=6, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        tkinter.Button(
             self._side_frame, text="Erosion", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__erosion
-        ).grid(row=7, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        ).grid(row=5, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         tkinter.Button(
             self._side_frame, text="Dilation", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__dilation
-        ).grid(row=8, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        ).grid(row=6, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
     def __negative(self):
         if self._edited_img:
-            self._editing_img = ImageOps.invert(self._edited_img)
+            self._editing_img = self._edited_img.convert('RGB').point(lambda x: 255-x)
             self._displayImage(self._editing_img)
     
     def __blackWhite(self):
@@ -143,12 +136,15 @@ class App(AppFrame):
         pass
     
     def __sketch(self):
-        pass
-    
-    def __emboss(self):
         if self._edited_img:
-            self._editing_img = self._edited_img.filter(ImageFilter.EMBOSS)
+            img_gray = self._edited_img.convert('L')
+            img_invert = img_gray.point(lambda x: 255-x)
+            img_smooth = img_invert.filter(ImageFilter.GaussianBlur(200))
+            invert_smooth = img_smooth.point(lambda x: 255-x)
+            final = asarray(img_gray) / asarray(invert_smooth) * 256
+            self._editing_img = Image.fromarray(final)
             self._displayImage(self._editing_img)
+            
             
     def __sepia(self):
         pass
@@ -156,28 +152,38 @@ class App(AppFrame):
     def __thresholding(self, value):
         if self._edited_img:
             value = int(value)
-            self._editing_img = self._edited_img.convert('L').point(lambda x: 255 if x > value else 0)
+            self._editing_img = self._edited_img.point(lambda x: 256 if x >= value else 0)
             self._displayImage(self._editing_img)
     
     def __erosion(self):
-        pass
+        if self._edited_img:
+            self._editing_img = self._edited_img.filter(ImageFilter.MinFilter(3))
+            self._displayImage(self._editing_img)
+            
     
     def __dilation(self):
-        pass
+        if self._edited_img:
+            self._editing_img = self._edited_img.filter(ImageFilter.MaxFilter(3))
+            self._displayImage(self._editing_img)
     
-    def __blur_sharp_image(self):
+    def __levelAdjust(self):
         self._refresh_side_frame()
-        tkinter.Label(self._side_frame, text='Blur Level', font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
-                      ).grid(row=1, column=0, padx=Macros.PADX, sticky=Macros.BUTTON_STICKY)
         
-        tkinter.Scale(self._side_frame, from_=1, to=50, orient='horizontal', bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG, command=self.__blurImage
+        tkinter.Scale(self._side_frame, from_=1, to=50, label='Blur', orient='horizontal',
+                      font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG, command=self.__blurImage
                       ).grid(row=0, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
         
-        tkinter.Label(self._side_frame, text='Sharpness Level', font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
-                      ).grid(row=3, column=0, padx=Macros.PADX, sticky=Macros.BUTTON_STICKY)
+        tkinter.Scale(self._side_frame, from_=1, to=50, label='Sharpness', orient='horizontal',
+                      font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG, command=self.__sharpenImage
+                      ).grid(row=1, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
         
-        tkinter.Scale(self._side_frame, from_=1, to=50, orient='horizontal', bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG, command=self.__sharpenImage
+        tkinter.Scale(self._side_frame, from_=0.0, resolution=0.1, to=3.0, label='Brightness', orient='horizontal',
+                      font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG, command=self.__brightenImage
                       ).grid(row=2, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+
+        tkinter.Scale(self._side_frame, from_=0.0, resolution=0.1, to=3.0, label='Saturation', orient='horizontal',
+                      font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG, command=self.__saturateImage
+                      ).grid(row=3, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
     
     def __blurImage(self, value):
@@ -185,14 +191,22 @@ class App(AppFrame):
             value = int(value)
             self._editing_img = self._edited_img.filter(ImageFilter.GaussianBlur(value))
             self._displayImage(self._editing_img)
-        
-        
+            
     def __sharpenImage(self, value):
         if self._edited_img:
             value = int(value)
             self._editing_img = ImageEnhance.Sharpness(self._edited_img).enhance(value)
             self._displayImage(self._editing_img)
     
+    def __brightenImage(self, value):
+        if self._edited_img:
+            self._editing_img = ImageEnhance.Brightness(self._edited_img).enhance(float(value))
+            self._displayImage(self._editing_img)
+            
+    def __saturateImage(self, value):
+        if self._edited_img:
+            self._editing_img = ImageEnhance.Color(self._edited_img).enhance(float(value))
+            self._displayImage(self._editing_img)
         
 if __name__ == "__main__":
     app = App()
