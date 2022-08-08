@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
-from PIL import Image, ImageFilter, ImageEnhance, ImageOps, ImageMath
+from turtle import width
+from typing_extensions import IntVar
+from PIL import Image, ImageFilter, ImageEnhance
 import tkinter
 from tkinter import filedialog
 
-from numpy import asarray, invert
-import numpy
+from numpy import asarray
 import Macros
 from AppFrame import AppFrame
 
@@ -28,6 +29,7 @@ class App(AppFrame):
         self.Buttons['Rotate Right'].config(command=self.__rotateRight)
         self.Buttons['Flip Horizontal'].config(command=self.__flipHorizontal)
         self.Buttons['Flip Vertical'].config(command=self.__flipVertical)
+        self.Buttons['Resize'].config(command=self.__resize)
         
     def __rotateLeft(self):
         if self._editing_img:
@@ -85,11 +87,36 @@ class App(AppFrame):
     
     def __cancelChanges(self):
         if self._edited_img:
-            self.__editing_img = self._edited_img.copy()
-            self._displayImage(self.__editing_img)
+            self._editing_img = self._edited_img.copy()
+            self._displayImage(self._editing_img)
     
     def __cropImage(self):
-        pass
+        self.rectangleID = 0
+        self.startX, self.startY, self.endX, self.endY = 0, 0, 0, 0
+        
+        def start(event):
+            self.startX, self.startY = event.x, event.y
+        
+        def crop(event):
+            if self.rectangleID:
+                self._canvas.delete(self.rectangleID)
+            
+            self.endX, self.endY = event.x, event.y
+            self.rectangleID = self._canvas.create_rectangle(self.startX, self.startY, self.endX, self.endY, width=1)
+            
+        def end(event):
+            self.endX, self.endY = event.x, event.y
+            
+            self.startX, self.endX = int(min(self.startX, self.endX) * self._ratio), int(max(self.startX, self.endX) * self._ratio)
+            self.startY, self.endY = int(min(self.startY, self.endY) * self._ratio), int(max(self.startY, self.endY) * self._ratio)
+            
+            self._editing_img = self._edited_img.crop((self.startX, self.startY, self.endX, self.endY))
+            self._displayImage(self._editing_img)
+        
+        self._canvas.bind("<ButtonPress>", start)
+        self._canvas.bind("<B1-Motion>", crop)
+        self._canvas.bind("<ButtonRelease>", end)
+            
     
     def __splitChannel(self):
         self._refresh_side_frame()
@@ -137,25 +164,29 @@ class App(AppFrame):
         ).grid(row=1, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         tkinter.Button(
-            self._side_frame, text="Stylisation", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__stylization
+            self._side_frame, text="Detect Edge", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__detectEdge
         ).grid(row=2, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         tkinter.Button(
-            self._side_frame, text="Pencil Sketch", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__sketch
+            self._side_frame, text="Enhance Edge", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__enhanceEdge
         ).grid(row=3, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+
+        tkinter.Button(
+            self._side_frame, text="Pencil Sketch", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__sketch
+        ).grid(row=4, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         tkinter.Scale(
             self._side_frame, label="Thresholding", from_=0, to=256, font=Macros.BUTTON_FONT, orient='horizontal',
             fg=Macros.BUTTON_FG,bg=Macros.BUTTON_BG, command=self.__thresholding
-        ).grid(row=4, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
-
-        tkinter.Button(
-            self._side_frame, text="Erosion", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__erosion
         ).grid(row=5, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         tkinter.Button(
-            self._side_frame, text="Dilation", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__dilation
+            self._side_frame, text="Erosion", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__erosion
         ).grid(row=6, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+
+        tkinter.Button(
+            self._side_frame, text="Dilation", font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__dilation
+        ).grid(row=7, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
     def __negative(self):
         if self._edited_img:
@@ -167,8 +198,15 @@ class App(AppFrame):
             self._editing_img = self._edited_img.convert('L')
             self._displayImage(self._editing_img)
             
-    def __stylization(self):
-        pass
+    def __detectEdge(self):
+        if self._edited_img:
+            self._editing_img = self._edited_img.filter(ImageFilter.FIND_EDGES)
+            self._displayImage(self._editing_img)
+            
+    def __enhanceEdge(self):
+        if self._edited_img:
+            self._editing_img = self._edited_img.filter(ImageFilter.EDGE_ENHANCE_MORE)
+            self._displayImage(self._editing_img)
     
     def __sketch(self):
         if self._edited_img:
@@ -249,7 +287,53 @@ class App(AppFrame):
         if self._edited_img:
             self._editing_img = ImageEnhance.Contrast(self._edited_img).enhance(float(value))
             self._displayImage(self._editing_img)
-        
+            
+
+    def __resize(self):
+        if self._edited_img:
+            self._refresh_side_frame()
+            
+            width, height = self._editing_img.size
+            
+            tkinter.Label(self._side_frame, text='Current Size:',  font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
+                          ).grid(row=0, column=0, sticky=Macros.BUTTON_STICKY)
+            
+            tkinter.Label(self._side_frame, text=f'{width} X {height}',  font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
+                          ).grid(row=1, column=0, sticky=Macros.BUTTON_STICKY)
+            
+            tkinter.Label(self._side_frame, text='',  font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
+                          ).grid(row=2, column=0, sticky=Macros.BUTTON_STICKY)
+            
+            self.sizeFrame = tkinter.Frame(self._side_frame)
+            self.sizeFrame.grid(row=3, column=0)
+            
+            self.widthBox = tkinter.Entry(self.sizeFrame, font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG, width=5)
+            self.widthBox.grid(row=0, column=0, sticky=Macros.BUTTON_STICKY)
+            
+            tkinter.Label(self.sizeFrame, text='X',  font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
+                          ).grid(row=0, column=1, sticky=Macros.BUTTON_STICKY)
+            
+            self.heightBox = tkinter.Entry(self.sizeFrame, font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG, fg=Macros.BUTTON_FG, width=5)
+            self.heightBox.grid(row=0, column=2, sticky=Macros.BUTTON_STICKY)
+            
+            tkinter.Label(self._side_frame, text='',  font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
+                          ).grid(row=4, column=0, sticky=Macros.BUTTON_STICKY)
+            
+            tkinter.Button(self._side_frame, text='Resize', bg=Macros.APP_BG, fg=Macros.BUTTON_FG,
+                           font=Macros.BUTTON_FONT, command=self.__resizeImage).grid(row=5, column=0)
+            
+            tkinter.Label(self._side_frame, text='(Apply Changes\nto see them)',  font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
+                          ).grid(row=6, column=0, columnspan=2, sticky=Macros.BUTTON_STICKY)
+            
+
+    def __resizeImage(self):
+        if self.widthBox.get() and self.heightBox.get():
+            width, height = self.widthBox.get(), self.heightBox.get()
+            if width.isnumeric() and height.isnumeric():
+                self._editing_img = self._edited_img.resize((int(width), int(height)))
+                self._displayImage(self._editing_img)
+            self.__resize()
+            
 if __name__ == "__main__":
     app = App()
     app.run()

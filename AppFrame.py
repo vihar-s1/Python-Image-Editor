@@ -107,6 +107,9 @@ class AppFrame:
         self.Buttons['Flip Vertical'].grid(
             row=0, column=2, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
         
+        self.Buttons['Resize'] = tkinter.Button(self._app_frame, text="Resize Image", font=Macros.BUTTON_FONT, 
+                                                fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG)
+        self.Buttons['Resize'].grid(row=8, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         self._canvas = tkinter.Canvas(
             self._app_frame, height=Macros.CANVAS_HEIGHT, width=Macros.CANVAS_WIDTH, background="grey")
@@ -137,7 +140,8 @@ class AppFrame:
         self._canvas.unbind("<ButtonPress>")
         self._canvas.unbind("<B1-Motion>")
         self._canvas.unbind("<ButtonRelease>")
-        self._displayImage(self._edited_img)
+        if self._edited_img:
+            self._displayImage(self._edited_img)
         self._side_frame = tkinter.Frame(self._app_frame, bg=Macros.APP_BG)
         self._side_frame.grid(row=0, column=4, rowspan=10, padx=Macros.PADX, pady=Macros.PADY)
 
@@ -150,7 +154,7 @@ class AppFrame:
         newWidth, newHeight = width, height
         
         ratio = height / width
-
+        
         if height > Macros.CANVAS_HEIGHT or width > Macros.CANVAS_WIDTH:
             if ratio < 1:
                 newWidth = Macros.CANVAS_WIDTH
@@ -158,6 +162,8 @@ class AppFrame:
             else:
                 newHeight = Macros.CANVAS_HEIGHT
                 newWidth = int(newHeight / ratio)
+        
+        self._ratio = height / newHeight
 
         image = image.resize((newWidth, newHeight))
         self.display_img = PhotoImage(image=image)
