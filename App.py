@@ -13,6 +13,9 @@ from AppFrame import AppFrame
 
 class App(AppFrame):
     def __init__(self) -> None:
+        '''
+        - Assigns commands to the buttons from AppFrame.py
+        '''
         super().__init__()
         print(self.Buttons.keys())
         self.Buttons['Save'].config(command=self.__saveImage)
@@ -32,30 +35,46 @@ class App(AppFrame):
         self.Buttons['Resize'].config(command=self.__resize)
         
     def __rotateLeft(self):
+        '''
+        - Counter-clockwise rotation by 90 degrees
+        '''
         if self._editing_img:
             self._editing_img = self._editing_img.rotate(angle=90, expand=True)
             self._edited_img = self._edited_img.rotate(angle=90, expand=True)
             self._displayImage(self._editing_img)
         
     def __rotateRight(self):
+        '''
+        - Clockwise rotation by 90 degrees
+        '''
         if self._editing_img:
             self._editing_img = self._editing_img.rotate(angle=-90, expand=True)
             self._edited_img = self._edited_img.rotate(angle=-90, expand=True)
             self._displayImage(self._editing_img)
 
     def __flipHorizontal(self):
+        '''
+        - Left to Right Flip
+        '''
         if self._editing_img:
             self._editing_img = self._editing_img.transpose(Image.Transpose.TRANSPOSE.FLIP_LEFT_RIGHT)
             self._edited_img = self._edited_img.transpose(Image.Transpose.TRANSPOSE.FLIP_LEFT_RIGHT)
             self._displayImage(self._editing_img)
         
     def __flipVertical(self):
+        '''
+        - Top to Bottom Flip
+        '''
         if self._editing_img:
             self._editing_img = self._editing_img.transpose(Image.Transpose.TRANSPOSE.FLIP_TOP_BOTTOM)
             self._edited_img = self._edited_img.transpose(Image.Transpose.TRANSPOSE.FLIP_TOP_BOTTOM)
             self._displayImage(self._editing_img)
         
     def __saveImage(self):
+        '''
+        - Saves image overwriting the last saved image location (_destinationFile).
+        - The first __saveImage call for the given image has _destinationFile as None and so defaults to __saveAsImage call.
+        '''
         if self._edited_img:
             if self._destinationFile:
                 self._edited_img.save(fp=self._destinationFile)
@@ -63,8 +82,14 @@ class App(AppFrame):
                 self.__saveAsImage()
     
     def __saveAsImage(self):
+        '''
+        - Asks user to select the destination for saving the edited_img with user-selected extension.
+        - Overwrite confirmation by user required.
+        '''
         if self._edited_img:
             filename = filedialog.asksaveasfilename(confirmoverwrite=True)
+            if not filename:
+                return
             extension = self._filename.split('.')[-1]
             if len(filename.split('.')) != 1:
                 extension = filename.split('.')[-1]
@@ -75,22 +100,43 @@ class App(AppFrame):
                 self._destinationFile = filename + '.' + extension
     
     def __resetImage(self):
+        '''
+        - sets editing and edited image as original image
+        '''
         if self._original_img:
             self._editing_img = self._original_img.copy()
             self._edited_img = self._original_img.copy()
             self._displayImage(self._edited_img)
     
     def __applyChanges(self):
+        '''
+        - applies the current implemented changes
+        - sets edited_img to editing_img
+        '''
         if self._editing_img:
             self._edited_img = self._editing_img.copy()
             self._displayImage(self._edited_img)
     
     def __cancelChanges(self):
+        '''
+        - discards the current implemented changes
+        - sets editing_img to edited_img
+        '''
         if self._edited_img:
             self._editing_img = self._edited_img.copy()
             self._displayImage(self._editing_img)
     
     def __cropImage(self):
+        '''
+        - crop image action divided in three stages
+            - start() --> locks the top-left corner for the final cropped image when left-mouse button is clicked
+            - crop() --> constantly resets the rectangle border displayed around the to-be-cropped image as cursor drags the bottom-right corner
+            - end() --> locks the botom-right corner for the final cropped image when left-mouse button is released, and then crops the image
+        '''
+        self._refresh_side_frame()
+        tkinter.Label(self._side_frame, text="Click and drag\non image to crop", font=Macros.BUTTON_FONT,
+                      bg=Macros.APP_BG, fg=Macros.BUTTON_FG).grid(row=0, column=0)
+        
         self.rectangleID = 0
         self.startX, self.startY, self.endX, self.endY = 0, 0, 0, 0
         
@@ -119,6 +165,12 @@ class App(AppFrame):
             
     
     def __splitChannel(self):
+        '''
+        - Converts the given image into RGB type and then splits the red values, blue values and green values of the image based on selection.
+        - Red Channel  Button shows the image when all green and blue pixels are set to 0.
+        - green Channel  Button shows the image when all blue and red pixels are set to 0.
+        - blue Channel  Button shows the image when all red and green pixels are set to 0.
+        '''
         self._refresh_side_frame()
         
         tkinter.Button(self._side_frame, text='Red Channel', font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__redChannel
@@ -131,6 +183,9 @@ class App(AppFrame):
                        ).grid(row=2, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
         
     def __redChannel(self):
+        '''
+        - Shows the red value of all the image pixels
+        '''
         if self._edited_img:
             red = self._edited_img.convert("RGB").getdata(0)
             red = [ (r, 0, 0) for r in red ]
@@ -138,6 +193,9 @@ class App(AppFrame):
             self._displayImage(self._editing_img)
         
     def __greenChannel(self):
+        '''
+        - Shows the green value of all the image pixels
+        '''
         if self._edited_img:
             green = self._edited_img.convert("RGB").getdata(1)
             green = [ (0, g, 0) for g in green ]
@@ -145,6 +203,9 @@ class App(AppFrame):
             self._displayImage(self._editing_img)
         
     def __blueChannel(self):
+        '''
+        - Shows the blue value of all the image pixels
+        '''
         if self._edited_img:
             blue = self._edited_img.convert("RGB").getdata(2)
             blue = [ (0, 0, b) for b in blue ]
@@ -153,6 +214,9 @@ class App(AppFrame):
     
     
     def __filters(self):
+        '''
+        - Displays option for various filters available under 'Apply Filters' Menu Button
+        '''
         self._refresh_side_frame()
         
         tkinter.Button(
@@ -189,26 +253,42 @@ class App(AppFrame):
         ).grid(row=7, column=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
     def __negative(self):
+        '''
+        - Inverts image. Subtracting each pixel value from white pixel
+        '''
         if self._edited_img:
             self._editing_img = self._edited_img.convert('RGB').point(lambda x: 255-x)
             self._displayImage(self._editing_img)
     
     def __blackWhite(self):
+        '''
+        - Gray-scale conversion
+        '''
         if self._edited_img:
             self._editing_img = self._edited_img.convert('L')
             self._displayImage(self._editing_img)
             
     def __detectEdge(self):
+        '''
+        - Detects and displays the edges of the image.
+        - sharper the edge more clearly visible it will be.
+        '''
         if self._edited_img:
             self._editing_img = self._edited_img.filter(ImageFilter.FIND_EDGES)
             self._displayImage(self._editing_img)
             
     def __enhanceEdge(self):
+        '''
+        - Enhances the contrast around the edges of the image to show them more distinctly.
+        '''
         if self._edited_img:
             self._editing_img = self._edited_img.filter(ImageFilter.EDGE_ENHANCE_MORE)
             self._displayImage(self._editing_img)
     
     def __sketch(self):
+        '''
+        - Converts the image into what it can look like as a pencil sketching
+        '''
         if self._edited_img:
             img_gray = self._edited_img.convert('L')
             img_invert = img_gray.point(lambda x: 255-x)
@@ -222,24 +302,37 @@ class App(AppFrame):
             self._displayImage(self._editing_img)
         
     
-    def __thresholding(self, value):
+    def __thresholding(self, threshold):
+        '''
+        - sets each pixel to either minimum value or maximum value based on a certain threshold value
+        '''
         if self._edited_img:
-            value = int(value)
-            self._editing_img = self._edited_img.point(lambda x: 256 if x >= value else 0)
+            threshold = int(threshold)
+            self._editing_img = self._edited_img.point(lambda x: 256 if x >= threshold else 0)
             self._displayImage(self._editing_img)
     
     def __erosion(self):
+        '''
+        Decreases the amount of bright pixels from the image
+        '''
         if self._edited_img:
             self._editing_img = self._edited_img.filter(ImageFilter.MinFilter(3))
             self._displayImage(self._editing_img)
             
     
     def __dilation(self):
+        '''
+        Decreases the amount of dark pixels from the image
+        '''
         if self._edited_img:
             self._editing_img = self._edited_img.filter(ImageFilter.MaxFilter(3))
             self._displayImage(self._editing_img)
     
     def __levelAdjust(self):
+        '''
+        - Adjust various levels of the image like brightness, saturation, contrast and more.
+        - All level Scales' action commands have self-explanatory names
+        '''
         self._refresh_side_frame()
         
         tkinter.Scale(self._side_frame, from_=1, to=50, label='Blur', orient='horizontal',
@@ -290,9 +383,14 @@ class App(AppFrame):
             
 
     def __resize(self):
-        if self._edited_img:
+        '''
+        - Resizing options displayed in the side frame.
+        - Displays current size of the image and an input for new width and new height.
+        - Resizes the image on clicking the Resize button by calling __resizeImage function
+        '''
+        if self._editing_img:
             self._refresh_side_frame()
-            
+            self._displayImage(self._editing_img)
             width, height = self._editing_img.size
             
             tkinter.Label(self._side_frame, text='Current Size:',  font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
@@ -327,11 +425,21 @@ class App(AppFrame):
             
 
     def __resizeImage(self):
+        '''
+        - Resizes the image if input for both width and height is given and both are integer values.
+        - The resize performed is soft resize, i.e., aspect ratio on resizing is not maintained. 
+            - The image will get stretched to fill the new aspect ratio.
+        '''
         if self.widthBox.get() and self.heightBox.get():
             width, height = self.widthBox.get(), self.heightBox.get()
-            if width.isnumeric() and height.isnumeric():
-                self._editing_img = self._edited_img.resize((int(width), int(height)))
-                self._displayImage(self._editing_img)
+            try:
+                width = int(width.strip())
+                height = int(height.strip())
+                self._editing_img = self._edited_img.resize(size=(width, height))
+                print((width, height))
+                print(self._editing_img.size)
+            except Exception as e:
+                pass
             self.__resize()
             
 if __name__ == "__main__":
