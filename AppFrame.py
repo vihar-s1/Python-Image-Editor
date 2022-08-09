@@ -62,7 +62,7 @@ class AppFrame:
 
         # tkinter.tk.quit exits the initialized object ...basically exiting the main window --> quit the program
         tkinter.Button(self._header_buttons, text="Exit Editor", font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
-                       fg=Macros.BUTTON_FG, command=self._window.quit).grid(row=0, column=5, padx=Macros.PADX)
+                       fg=Macros.BUTTON_FG, command=self.__exitEditor).grid(row=0, column=5, padx=Macros.PADX)
 
         # All the buttons and frames and canvas used for creating the App Frame will be children of the _app_frame
         self._app_frame = tkinter.Frame(self._window, bg=Macros.APP_BG)
@@ -148,6 +148,14 @@ class AppFrame:
         self.__rotateRightIcon = PhotoImage( Image.open('./static/rotate_right.png').resize(Macros.ICON_SIZE) )
         self.__flipHorizontalIcon = PhotoImage( Image.open('./static/flip_horizontal.png').resize(Macros.ICON_SIZE) )
         self.__flipVerticalIcon = PhotoImage( Image.open('./static/flip_vertical.png').resize(Macros.ICON_SIZE) )
+    
+    
+    def __exitEditor(self):
+        if self._edited_img:
+            self._edited_img.close()
+            self._editing_img.close()
+            self._original_img.close()
+        self._window.quit()
     
     
     def __upload_image(self):

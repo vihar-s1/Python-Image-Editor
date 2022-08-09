@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from turtle import width
-from typing_extensions import IntVar
 from PIL import Image, ImageFilter, ImageEnhance
 import tkinter
 from tkinter import filedialog
@@ -291,11 +289,9 @@ class App(AppFrame):
         '''
         if self._edited_img:
             img_gray = self._edited_img.convert('L')
-            img_invert = img_gray.point(lambda x: 255-x)
-            img_smooth = img_invert.filter(ImageFilter.GaussianBlur(200))
-            invert_smooth = img_smooth.point(lambda x: 255-x)
+            img_smooth = img_gray.filter(ImageFilter.GaussianBlur(150))
             try: # To suppress RuntimeWarning of divide by zero, and invalid value encountered
-                final = asarray(img_gray) / asarray(invert_smooth) * 256
+                final = asarray(img_gray) / asarray(img_smooth) * 256.0
             except Exception:
                 pass
             self._editing_img = Image.fromarray(final)
