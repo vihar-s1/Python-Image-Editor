@@ -7,8 +7,8 @@ BUTTON_FONT = ('Arial', 11, 'italic')
 BUTTON_BG = '#181818'
 BUTTON_FG = '#00ffff'
 
-CANVAS_HEIGHT = 500
-CANVAS_WIDTH = 600
+CANVAS_HEIGHT = 600
+CANVAS_WIDTH = 900
 
 FILETYPES = (('image files', ('*png', '*.jpg', '*.jpeg', '*.gif')),)
 BRIGHT_GREEN = '#00ff0f'

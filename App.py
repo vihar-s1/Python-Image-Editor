@@ -154,6 +154,11 @@ class App(AppFrame):
             self.startX, self.endX = int(min(self.startX, self.endX) * self._ratio), int(max(self.startX, self.endX) * self._ratio)
             self.startY, self.endY = int(min(self.startY, self.endY) * self._ratio), int(max(self.startY, self.endY) * self._ratio)
             
+            # Truncating cropping going outside the image
+            width, height = self._edited_img.size
+            self.startX, self.endX = max(self.startX, 0), min(self.endX, width)
+            self.startY, self.endY = max(self.startY, 0), min(self.endY, height)
+            
             self._editing_img = self._edited_img.crop((self.startX, self.startY, self.endX, self.endY))
             self._displayImage(self._editing_img)
         
