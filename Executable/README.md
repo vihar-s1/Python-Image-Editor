@@ -1,4 +1,4 @@
-# <i> Creating .exe file from .py file.</i>
+# <i> Creating a single .exe file from .py file.</i>
 
 - <i>STEP 1</i> : install pyinstaller module by <i><b>pip install pyinstaller</b></i>
 
@@ -8,6 +8,6 @@
 
 - Two folders named <b><i>build</i></b> and <b><i>dist</i></b> are created along with a file <b><i><Main_FileName></i>.spec</b>
 
-- run the executable in <i><b>dist/<Main_FileName>/</b></i> folder...labeled as <b><i><Main_FileName></i>.exe.</b>
+- The executable is present in <i><b>dist/<Main_FileName>/</b></i> folder...labeled as <b><i><Main_FileName></i>.exe.</b>
 
-- NOTE THAT FOR <i>static</i> FOLDER,  WE HAVE PROVIDED PATH RELATIVE TO OUR MAIN APP AND SO WE NEED TO COPY/MOVE THE FOLDER IN THE SAME LOCATION AS <i>App.exe</i>.
+- NOTE THAT FOR <i>static</i> FOLDER,  WE HAVE PROVIDED PATH RELATIVE TO OUR MAIN APP AND SO WE NEED TO COPY/MOVE THE FOLDER IN THE SAME LOCATION AS <i><Main_FileName>.exe</i> IF THE ICONS ARE NEEDED TO BE DISPLAYED.
