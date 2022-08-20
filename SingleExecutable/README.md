@@ -10,4 +10,4 @@
 
 - The executable is present in <i><b>dist/</b></i> folder...labeled as <b><i><Main_FileName></i>.exe.</b>
 
-- NOTE THAT FOR <i>static</i> FOLDER,  WE HAVE PROVIDED PATH RELATIVE TO OUR MAIN APP AND SO WE NEED TO COPY/MOVE THE FOLDER IN THE SAME LOCATION AS <i>App.exe</i>.
+- NOTE THAT FOR <i>static</i> FOLDER,  WE HAVE PROVIDED PATH RELATIVE TO OUR MAIN APP AND SO WE NEED TO COPY/MOVE THE FOLDER IN THE SAME LOCATION AS <i><Main_FileName>.exe</i> IF THE ICONS ARE NEEDED TO BE DISPLAYED.
