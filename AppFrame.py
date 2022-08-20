@@ -95,32 +95,32 @@ class AppFrame:
         self.__rotate_frame = tkinter.Frame(self._app_frame, bg=Macros.APP_BG)
         self.__rotate_frame.grid(row=5, column=0, columnspan=2)
         
-        self.Buttons['Rotate Left'] = tkinter.Button(self.__rotate_frame, image=self.__rotateLeftIcon, bg=Macros.BUTTON_BG,
-                                                      fg=Macros.BUTTON_FG)
+        self.Buttons['Rotate Left'] = tkinter.Button(self.__rotate_frame, image=self.__rotateLeftIcon, font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
+                                                      text="Left\nRotate" ,fg=Macros.BUTTON_FG)
         self.Buttons['Rotate Left'].grid(
             row=0, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
         
         self.Buttons['Rotate Right'] = tkinter.Button(self.__rotate_frame, image=self.__rotateRightIcon, font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
-                                                      fg=Macros.BUTTON_FG)
+                                                      text="Right\nRotate", fg=Macros.BUTTON_FG)
         self.Buttons['Rotate Right'].grid(
             row=0, column=2, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
         self.__flip_frame = tkinter.Frame(self._app_frame, bg=Macros.APP_BG)
-        self.__flip_frame.grid(row=7, column=0, columnspan=2)
+        self.__flip_frame.grid(row=6, column=0, columnspan=2)
         
-        self.Buttons['Flip Horizontal'] = tkinter.Button(self.__flip_frame, image=self.__flipHorizontalIcon, bg=Macros.BUTTON_BG,
-                                                    fg=Macros.BUTTON_FG)
+        self.Buttons['Flip Horizontal'] = tkinter.Button(self.__flip_frame, image=self.__flipHorizontalIcon, font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
+                                                    text="Horizotal\nFlip", fg=Macros.BUTTON_FG)
         self.Buttons['Flip Horizontal'].grid(
             row=0, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
         
-        self.Buttons['Flip Vertical'] = tkinter.Button(self.__flip_frame, image=self.__flipVerticalIcon, bg=Macros.BUTTON_BG,
-                                                    fg=Macros.BUTTON_FG)
+        self.Buttons['Flip Vertical'] = tkinter.Button(self.__flip_frame, image=self.__flipVerticalIcon, font=Macros.BUTTON_FONT, bg=Macros.BUTTON_BG,
+                                                    text="Vertical\nFlip", fg=Macros.BUTTON_FG)
         self.Buttons['Flip Vertical'].grid(
             row=0, column=2, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
         
         self.Buttons['Resize'] = tkinter.Button(self._app_frame, text="Resize Image", font=Macros.BUTTON_FONT, 
                                                 fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG)
-        self.Buttons['Resize'].grid(row=8, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
+        self.Buttons['Resize'].grid(row=7, column=0, columnspan=2, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
 
 
         # Creating canvas
@@ -144,10 +144,13 @@ class AppFrame:
         - Need to be along the rest of the console and frames definition because PIL.Imagetk.PhotoImage is tkinter supporting photoImage
         whick only works when atleast one tkintertk instance exists, 'self._window' in this instance
         '''
-        self.__rotateLeftIcon = PhotoImage( Image.open('./static/rotate_left.png').resize(Macros.ICON_SIZE) )
-        self.__rotateRightIcon = PhotoImage( Image.open('./static/rotate_right.png').resize(Macros.ICON_SIZE) )
-        self.__flipHorizontalIcon = PhotoImage( Image.open('./static/flip_horizontal.png').resize(Macros.ICON_SIZE) )
-        self.__flipVerticalIcon = PhotoImage( Image.open('./static/flip_vertical.png').resize(Macros.ICON_SIZE) )
+        try:
+            self.__rotateLeftIcon = PhotoImage( Image.open('./static/rotate_left.png').resize(Macros.ICON_SIZE) )
+            self.__rotateRightIcon = PhotoImage( Image.open('./static/rotate_right.png').resize(Macros.ICON_SIZE) )
+            self.__flipHorizontalIcon = PhotoImage( Image.open('./static/flip_horizontal.png').resize(Macros.ICON_SIZE) )
+            self.__flipVerticalIcon = PhotoImage( Image.open('./static/flip_vertical.png').resize(Macros.ICON_SIZE) )
+        except:
+            self.__rotateLeftIcon = self.__rotateRightIcon = self.__flipHorizontalIcon = self.__flipVerticalIcon = None
     
     
     def __exitEditor(self):

@@ -24,6 +24,12 @@ Open image file and displaying image file functions are the only defined functio
 Menu options for cropping image, splitting channel, applying filters, and adjusting various levels like blur, brightness, contrast, saturation, and sharpness.
 
 Rotating image, and flipping image icons set.
+Icon images are saved in static folder...all four images are needed for them to be displayed.
+
+<b>left rotate icon name: </b> <i>rotate_left.png</i><br>
+<b>right rotate icon name: </b> <i>rotate_right.png</i><br>
+<b>horizontal flip icon name: </b> <i>flip_horizontal.png</i><br>
+<b>vertical flip icon name: </b> <i>flip_veritcal.png</i><br>
 
 Resizing image button also available. <br><br>
 
@@ -55,3 +61,14 @@ Extends <b>AppFrame.py</b> and implements the button on-click actions and scale-
     - Textboxes to enter new width and height values.
     - 'Resize' button to resize the image.
     - Only resizes when both width and height are given and both are integers.
+
+## Executables (.exe)
+<hr>
+
+### Regular Executable
+Check <b><i>Executable</i></b> folder to get .exe version along with multiple necessary folders and files  of the program obtained by converting .py.
+
+### Single Executable
+Check <b><i>SingleExecutable</i></b> folder to get standalone .exe version of the program obtained by converting .py
+
+<b>NOTE THAT BOTH THE FOLDERS CONTAIN THEIR OWN  </b><i>README.md</i><b> FILES</b>
