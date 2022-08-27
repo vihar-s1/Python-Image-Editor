@@ -15,7 +15,7 @@ class App(AppFrame):
         - Assigns commands to the buttons from AppFrame.py
         '''
         super().__init__()
-        print(self.Buttons.keys())
+        
         self.Buttons['Save'].config(command=self.__saveImage)
         self.Buttons['Save As'].config(command=self.__saveAsImage)
         self.Buttons['Reset Image'].config(command=self.__resetImage)
@@ -175,6 +175,10 @@ class App(AppFrame):
         - blue Channel  Button shows the image when all red and green pixels are set to 0.
         '''
         self._refresh_side_frame()
+        
+        # Added to ensure that the dimensions of editing and edited images are same 
+        # when taking a particular channel value of pixels from edited image and putting it in editing image.
+        self._editing_img = self._edited_img.copy()
         
         tkinter.Button(self._side_frame, text='Red Channel', font=Macros.BUTTON_FONT, fg=Macros.BUTTON_FG, bg=Macros.BUTTON_BG, command=self.__redChannel
                        ).grid(row=0, column=0, padx=Macros.PADX, pady=Macros.PADY, sticky=Macros.BUTTON_STICKY)
@@ -421,9 +425,6 @@ class App(AppFrame):
             tkinter.Button(self._side_frame, text='Resize', bg=Macros.APP_BG, fg=Macros.BUTTON_FG,
                            font=Macros.BUTTON_FONT, command=self.__resizeImage).grid(row=5, column=0)
             
-            tkinter.Label(self._side_frame, text='(Apply Changes\nto see them)',  font=Macros.BUTTON_FONT, bg=Macros.APP_BG, fg=Macros.BUTTON_FG
-                          ).grid(row=6, column=0, columnspan=2, sticky=Macros.BUTTON_STICKY)
-            
 
     def __resizeImage(self):
         '''
@@ -437,8 +438,6 @@ class App(AppFrame):
                 width = int(width.strip())
                 height = int(height.strip())
                 self._editing_img = self._edited_img.resize(size=(width, height))
-                print((width, height))
-                print(self._editing_img.size)
             except Exception as e:
                 pass
             self.__resize()

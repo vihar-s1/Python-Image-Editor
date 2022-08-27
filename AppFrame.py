@@ -1,11 +1,27 @@
 #!/usr/bin/env python
 
+from email.mime import base
 import tkinter, os
 from tkinter import filedialog
 from PIL import Image
 from PIL.ImageTk import PhotoImage
 
 import Macros
+
+import sys
+from os import path
+
+# Function needed to make sure that .exe version of the code uses static files integrated in it and does not need to be provided explicitly.
+# The .exe when running, creates a temporary folder and stores images in that folder.
+def resource_path(relative_path: str):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception as e:
+        base_path = path.abspath(".")
+
+    return path.join(base_path, relative_path)
 
 
 class AppFrame:
@@ -145,10 +161,10 @@ class AppFrame:
         whick only works when atleast one tkintertk instance exists, 'self._window' in this instance
         '''
         try:
-            self.__rotateLeftIcon = PhotoImage( Image.open('./static/rotate_left.png').resize(Macros.ICON_SIZE) )
-            self.__rotateRightIcon = PhotoImage( Image.open('./static/rotate_right.png').resize(Macros.ICON_SIZE) )
-            self.__flipHorizontalIcon = PhotoImage( Image.open('./static/flip_horizontal.png').resize(Macros.ICON_SIZE) )
-            self.__flipVerticalIcon = PhotoImage( Image.open('./static/flip_vertical.png').resize(Macros.ICON_SIZE) )
+            self.__rotateLeftIcon = PhotoImage( Image.open( resource_path('static\\rotate_left.png') ).resize(Macros.ICON_SIZE) ) 
+            self.__rotateRightIcon = PhotoImage( Image.open( resource_path('static\\rotate_right.png') ).resize(Macros.ICON_SIZE) )
+            self.__flipHorizontalIcon = PhotoImage( Image.open( resource_path('static\\flip_horizontal.png') ).resize(Macros.ICON_SIZE) )
+            self.__flipVerticalIcon = PhotoImage( Image.open( resource_path('static\\flip_vertical.png') ).resize(Macros.ICON_SIZE) )
         except:
             self.__rotateLeftIcon = self.__rotateRightIcon = self.__flipHorizontalIcon = self.__flipVerticalIcon = None
     
