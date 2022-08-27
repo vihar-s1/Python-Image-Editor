@@ -33,6 +33,9 @@ Icon images are saved in static folder...all four images are needed for them to 
 
 Resizing image button also available. <br><br>
 
+The <b>resource_path</b> is defined so that when the project is compiled into a .exe file, the images are not needed to be explicitly provided.
+On running the executable, it extracts the additional files/folders into the system's temporary folder. The <b>resource_path</b> checks this for temporary folder and if it exists, it returns base path as the temp folder, otherwise, the current folder is returned as the base folder for the additional files/folders.
+
 ### App.py
 Extends <b>AppFrame.py</b> and implements the button on-click actions and scale-sliding actions for various features opened through the menu buttons.
 
@@ -65,10 +68,18 @@ Extends <b>AppFrame.py</b> and implements the button on-click actions and scale-
 ## Executables (.exe)
 <hr>
 
-### Regular Executable
-Check <b><i>Executable</i></b> folder to get .exe version along with multiple necessary folders and files  of the program obtained by converting .py.
+Contains two executables and their respective spec files.
 
-### Single Executable
-Check <b><i>SingleExecutable</i></b> folder to get standalone .exe version of the program obtained by converting .py
+- <b>ConsoleBasedApp</b>
+    - The executable is based on console interface. On running, a console screen will open which will then in turn run the application interface.
+    - The command to compile the executable as console based executable is as follows:
+    
+    ![](https://user-images.githubusercontent.com/96971096/187042709-32bbefc9-e23b-43fd-928c-9ca3177494ea.png)
 
-<b>NOTE THAT BOTH THE FOLDERS CONTAIN THEIR OWN  </b><i>README.md</i><b> FILES</b>
+- <b>WindowBasedApp</b>
+    - THe executable uses a window as an interface. It hides the console while opening the app.
+    - The command to compile the executable as window based executable is as follows:
+
+   ![](https://user-images.githubusercontent.com/96971096/187042767-68656c6c-e16f-49f5-abf9-3c79d7ff72e2.png)
+
+The <b>--add-data</b> flag in both the case tells the <b>pyisntaller</b> to include the specified file/folder in the executable file. The <b>static/</b> tells the executable where to extract the data while running. The extracted data is temporary and is deleted once app closes.
