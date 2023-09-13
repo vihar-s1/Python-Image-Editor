@@ -14,30 +14,11 @@ App.py
 ### Macros.py
 Consists of global constant values used repeatedly all through the code. <br><br>
 
-### AppFrame.py
-Consists of framework for the app. Consists of layout for save, save as, resetting, cancelling, and applying changes.
+### ImageEditor.py
+Consists all the functions for image editing. A generalized module for image editing.
 
-Consists of central canvas arounf which all the buttons are oriented.
-
-Open image file and displaying image file functions are the only defined functions.
-
-Menu options for cropping image, splitting channel, applying filters, and adjusting various levels like blur, brightness, contrast, saturation, and sharpness.
-
-Rotating image, and flipping image icons set.
-Icon images are saved in static folder...all four images are needed for them to be displayed.
-
-<b>left rotate icon name: </b> <i>rotate_left.png</i><br>
-<b>right rotate icon name: </b> <i>rotate_right.png</i><br>
-<b>horizontal flip icon name: </b> <i>flip_horizontal.png</i><br>
-<b>vertical flip icon name: </b> <i>flip_veritcal.png</i><br>
-
-Resizing image button also available. <br><br>
-
-The <b>resource_path</b> is defined so that when the project is compiled into a .exe file, the images are not needed to be explicitly provided.
-On running the executable, it extracts the additional files/folders into the system's temporary folder. The <b>resource_path</b> checks this for temporary folder and if it exists, it returns base path as the temp folder, otherwise, the current folder is returned as the base folder for the additional files/folders.
-
-### App.py
-Extends <b>AppFrame.py</b> and implements the button on-click actions and scale-sliding actions for various features opened through the menu buttons.
+### EditorUI.py
+The UI of Image Editor which uses the functions defined in the ImageEditor.py to perform image editing in the background.
 
 ## FEATURES
 <hr>
@@ -66,20 +47,16 @@ Extends <b>AppFrame.py</b> and implements the button on-click actions and scale-
     - Only resizes when both width and height are given and both are integers.
 
 ## Executables (.exe)
+
+Converted to executable via auto-py-to-exe module of python.
 <hr>
 
 Contains two executables and their respective spec files.
 
 - <b>ConsoleBasedApp</b>
     - The executable is based on console interface. On running, a console screen will open which will then in turn run the application interface.
-    - The command to compile the executable as console based executable is as follows:
-    
-    ![](https://user-images.githubusercontent.com/96971096/187042709-32bbefc9-e23b-43fd-928c-9ca3177494ea.png)
 
 - <b>WindowBasedApp</b>
-    - THe executable uses a window as an interface. It hides the console while opening the app.
-    - The command to compile the executable as window based executable is as follows:
-
-   ![](https://user-images.githubusercontent.com/96971096/187042767-68656c6c-e16f-49f5-abf9-3c79d7ff72e2.png)
+    - The executable uses a window as an interface. It hides the console while opening the app.
 
 The <b>--add-data</b> flag in both the case tells the <b>pyisntaller</b> to include the specified file/folder in the executable file. The <b>static/</b> tells the executable where to extract the data while running. The extracted data is temporary and is deleted once app closes.

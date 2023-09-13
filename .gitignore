@@ -1,0 +1,3 @@
+# folders to exclude
+__pycache__
+.vscode
