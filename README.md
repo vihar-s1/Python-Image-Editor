@@ -4,20 +4,20 @@ A simple python based image editor. <br>
 
 Divided into three files: <br>
 <b>
-Macros.py <br>
-AppFrame.py <br>
-App.py
+- [Macros.py](#macrospy)
+- [ImageEditor.py](#imageeditorpy)
+- [EditorUI.py](#editoruipy)
 </b>
 
 <br>
 
-### Macros.py
+## Macros.py
 Consists of global constant values used repeatedly all through the code. <br><br>
 
-### ImageEditor.py
+## ImageEditor.py
 Consists all the functions for image editing. A generalized module for image editing.
 
-### EditorUI.py
+## EditorUI.py
 The UI of Image Editor which uses the functions defined in the ImageEditor.py to perform image editing in the background.
 
 ## FEATURES
